@@ -7,9 +7,15 @@ using ProductAPI.Services;
 using ProductAPI.Services.Impl;
 
 var builder = WebApplication.CreateBuilder(args);
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+  if (IsRelationalProvider(connectionString))
+    options.UseSqlServer(connectionString);
+  else
+    options.UseInMemoryDatabase("ProductDatabase");
+});
 
 builder.Services.AddScoped<ProductQueryHelper>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
@@ -44,5 +50,10 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+static bool IsRelationalProvider(string connectionString)
+{
+  return connectionString?.IndexOf("Server=", StringComparison.OrdinalIgnoreCase) >= 0;
+}
 
 public partial class Program { }
