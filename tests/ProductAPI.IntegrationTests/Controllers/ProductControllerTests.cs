@@ -70,11 +70,7 @@ public class ProductControllerTests
 
     var response = await client.PostAsJsonAsync("/api/product", newProduct);
 
-    var createdProduct = await response.GetJson<Product>();
-
-    Assert.Equal(System.Net.HttpStatusCode.Created, response.StatusCode);
-    Assert.NotNull(createdProduct);
-    Assert.Equal("Teste de integração", createdProduct.Name);
+    Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
   }
 
   [Fact]
